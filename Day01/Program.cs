@@ -14,14 +14,11 @@ Read(line =>
     frequency[parts[1]] = ++value;
 });
 
-var sum = left.Order()
+left.Order()
     .Zip(right.Order(), (l, r) => Math.Abs(l - r))
-    .Sum();
+    .Sum()
+    .ToConsole(sum => $"Solution to Part 1: {sum}");
 
-Console.WriteLine($"Solution to Part1: {sum}");
-
-var similarity = 
-    left.Sum(x => x * (frequency.TryGetValue(x, out int count) ? count : 0));
-
-Console.WriteLine($"Solution to Part2: {similarity}");
+left.Sum(x => x * (frequency.TryGetValue(x, out int count) ? count : 0))
+    .ToConsole(similarity => $"Solution to Part 2: {similarity}");
 
