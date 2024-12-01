@@ -1,80 +1,27 @@
 ﻿// https://adventofcode.com/2024/day/1
 
-Read(input => input!)
-    .Aggregate(0,
-        (checksum, lineOfText) =>
-        {
-            var first = lineOfText.FirstOrDefault(x => char.IsDigit(x)) - '0';
-            var last = lineOfText.LastOrDefault(x => char.IsDigit(x)) - '0';
-            var value = first * 10 + last;
-            checksum += value;
-            return checksum;
-        })
-    .ToConsole(sum => $"Part1: {sum}\r\n");
+var left = new List<int>();
+var right = new List<int>();
+var frequency = new Dictionary<int, int>();
 
-
-Read(input => input!)
-    .Aggregate(0,
-        (checksum, lineOfText) =>
-        {
-            var first = FindFirstDigit(lineOfText);
-            var last = FindLastDigit(lineOfText);
-            var value = first * 10 + last;
-
-            Console.WriteLine($"{lineOfText}: {value}");
-            checksum += value;
-            return checksum;
-        })
-    .ToConsole(sum => $"Part2: {sum}");
-
-bool TryGetDigit(string line, int offset, out int digit)
+Read(line =>
 {
-    Dictionary<string, int> stringDigitMapping = new() { ["one"] = 1, ["two"] = 2, ["three"] = 3, ["four"] = 4, ["five"] = 5, ["six"] = 6, ["seven"] = 7, ["eight"] = 8, ["nine"] = 9 };
+    var parts = line.Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(int.Parse).ToArray();
+    left.Add(parts[0]);
+    right.Add(parts[1]);
 
-    digit = 0;
-    if (offset >= line.Length)
-    {
-        throw new ArgumentOutOfRangeException($"Offset {offset} is outside bounds of string with length {line.Length}.");
-    }
+    frequency.TryGetValue(parts[1], out int value);
+    frequency[parts[1]] = ++value;
+});
 
-    if (char.IsDigit(line[offset]))
-    {
-        digit = line[offset] - '0';
-        return true;
-    }
+var sum = left.Order()
+    .Zip(right.Order(), (l, r) => Math.Abs(l - r))
+    .Sum();
 
-    foreach (var pair in stringDigitMapping)
-    {
-        if (offset + pair.Key.Length <= line.Length && line.Substring(offset, pair.Key.Length) == pair.Key)
-        {
-            digit = pair.Value;
-            return true;
-        }
-    }
+Console.WriteLine($"Solution to Part1: {sum}");
 
-    return false;
-}
+var similarity = 
+    left.Sum(x => x * (frequency.TryGetValue(x, out int count) ? count : 0));
 
-int FindFirstDigit(string line)
-{
-    var digit = 0;
-    var offset = 0;
-    while (offset < line.Length && !TryGetDigit(line, offset, out digit))
-    {
-        offset++;
-    }
+Console.WriteLine($"Solution to Part2: {similarity}");
 
-    return digit;
-}
-
-int FindLastDigit(string line)
-{
-    var digit = 0;
-    var offset = line.Length - 1;
-    while (offset >= 0 && !TryGetDigit(line, offset, out digit))
-    {
-        offset--;
-    }
-
-    return digit;
-}

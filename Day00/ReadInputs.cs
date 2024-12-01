@@ -13,6 +13,14 @@ public static class ReadInputs
             .TakeWhile(x => !string.IsNullOrEmpty(x))
             .Select(x => factory(x!));
 
+    public static void Read(Action<string> action)
+    {
+        foreach (var line in Read().TakeWhile(x => !string.IsNullOrEmpty(x)))
+        {
+            action(line!);
+        }
+    }
+
     public static IEnumerable<T> ReadRecords<T>(Func<string[], T> factory)
     {
         var records = new List<string>();
