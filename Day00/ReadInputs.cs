@@ -8,6 +8,15 @@ public static class ReadInputs
     public static IEnumerable<IEnumerable<int>> ReadAsRowsOfIntegers()
         => Read(AsIntegers).Select(x => x);
 
+    public static IEnumerable<T> Read<T>(Func<IEnumerable<int>, T> factory)
+        => Read()
+            .TakeWhile(x => !string.IsNullOrEmpty(x))
+            .Select(line => factory(
+                line!
+                    .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .Select(int.Parse)));
+
+
     public static IEnumerable<T> Read<T>(Func<string, T> factory) =>
         Read()
             .TakeWhile(x => !string.IsNullOrEmpty(x))

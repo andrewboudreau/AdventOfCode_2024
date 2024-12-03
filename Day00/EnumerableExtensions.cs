@@ -25,5 +25,8 @@ namespace Day00
 
         public static T Second<T>(this IEnumerable<T> source) => source.ElementAt(1);
         public static T Third<T>(this IEnumerable<T> source) => source.ElementAt(2);
+
+        public static IEnumerable<T> WithoutElementAt<T>(this IEnumerable<T> source, int index) 
+            => source.Where((_, i) => i != index);
     }
 }
