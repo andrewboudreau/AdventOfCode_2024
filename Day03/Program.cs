@@ -47,7 +47,7 @@ class Lexer()
 
     public IReadOnlyList<Token> Tokenize(ReadOnlySpan<char> input)
     {
-        var tokens = new List<Token>();
+        List<Token> tokens = [];
         while (position < input.Length)
         {
             var ch = input[position];
@@ -99,24 +99,12 @@ class Lexer()
         return sb.ToString();
     }
 
-    private static bool IsSymbol(char c)
-    {
-        return c == '(' || c == ')' || c == ',';
-    }
+    private static bool IsSymbol(char c) => c == '(' || c == ')' || c == ',';
 
-    private static bool IsLetter(char c)
-    {
-        return char.IsLetter(c) || c == '\'';
-    }
+    private static bool IsLetter(char c) => char.IsLetter(c) || c == '\'';
 }
 
-enum TokenType
-{
-    Invalid,
-    Identifier,
-    Symbol,
-    Number
-}
+enum TokenType { Invalid, Identifier, Symbol, Number }
 
 readonly struct Token(TokenType type, string value, Range range)
 {
@@ -232,13 +220,7 @@ readonly struct Instruction(InstructionType operation, int? firstOperand = null,
     public static Instruction Invalid { get; } = new(InstructionType.Invalid);
 }
 
-enum InstructionType
-{
-    Invalid,
-    Mul,
-    Do,
-    Dont
-}
+enum InstructionType { Invalid, Mul, Do, Dont }
 
 class Evaluator
 {
