@@ -161,7 +161,7 @@ class Parser(IReadOnlyList<Token> tokens)
             && tokens[position + 1].Type == TokenType.Symbol && tokens[position + 1].Value == "("
             && tokens[position + 2].Type == TokenType.Symbol && tokens[position + 2].Value == ")")
         {
-            instruction = new Instruction(InstructionType.Do);
+            instruction = Instruction.Do;
             return true;
         };
 
@@ -169,7 +169,7 @@ class Parser(IReadOnlyList<Token> tokens)
             && tokens[position + 1].Type == TokenType.Symbol && tokens[position + 1].Value == "("
             && tokens[position + 2].Type == TokenType.Symbol && tokens[position + 2].Value == ")")
         {
-            instruction = new Instruction(InstructionType.Dont);
+            instruction = Instruction.Dont;
             return true;
         }
 
@@ -218,6 +218,8 @@ readonly struct Instruction(InstructionType operation, int? firstOperand = null,
     }
 
     public static Instruction Invalid { get; } = new(InstructionType.Invalid);
+    public static Instruction Do { get; } = new(InstructionType.Do);
+    public static Instruction Dont { get; } = new(InstructionType.Dont);
 }
 
 enum InstructionType { Invalid, Mul, Do, Dont }
