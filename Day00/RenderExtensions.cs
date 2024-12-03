@@ -31,6 +31,6 @@ namespace Day00
         }
 
         public static void ToConsole<T>(this T source, string title)
-            => ToConsole(source, x => $"{title}\r\n{x?.ToString() ?? string.Empty}\r\n");
+            => ToConsole(source, x => $"{title}{Environment.NewLine}{x?.ToString() ?? string.Empty}{Environment.NewLine}");
     }
 }
