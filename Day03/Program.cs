@@ -148,7 +148,7 @@ class Parser(IReadOnlyList<Token> tokens)
                 yield return mul;
                 position += 6;
             }
-            else if (IsValidControlInstruction(out var control))
+            else if (IsValidControlInstruction(out Instruction control))
             {
                 yield return control;
                 position += 3;
@@ -259,19 +259,17 @@ class ConditionalEvaluator
 
     public int Evaluate(Instruction instruction)
     {
-        if (instruction.Operation == InstructionType.Do)
+        if (isEnabled && instruction.Operation == InstructionType.Mul)
+        {
+            return instruction.FirstOperand!.Value * instruction.SecondOperand!.Value;
+        }
+        else if (instruction.Operation == InstructionType.Do)
         {
             isEnabled = true;
-            return 0;
         }
         else if (instruction.Operation == InstructionType.Dont)
         {
             isEnabled = false;
-            return 0;
-        }
-        else if (instruction.Operation == InstructionType.Mul && isEnabled)
-        {
-            return instruction.FirstOperand!.Value * instruction.SecondOperand!.Value;
         }
 
         return 0;
