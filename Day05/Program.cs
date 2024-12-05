@@ -57,12 +57,7 @@ foreach (var update in pageUpdates)
     }
 }
 
-int part1 = 0;
-foreach (var update in validUpdates)
-{
-    part1 += update[update.Count / 2];
-}
-
+int part1 = validUpdates.Select(x => x[x.Count / 2]).Sum();
 Console.WriteLine($"Part 1: {validUpdates.Count} valid sets page updates with a checksum of {part1}");
 
 
@@ -79,8 +74,7 @@ do
         //Console.WriteLine("Original set {0}", string.Join(", ", update));
         foreach (var rules in pageOrderingRules)
         {
-            var page = rules.Key;
-            var indexOfPage = update.IndexOf(page);
+            var indexOfPage = update.IndexOf(rules.Key);
 
             foreach (var mustComeBefore in rules.Value)
             {
@@ -90,7 +84,6 @@ do
                     indexOfMustComeBefore != -1 &&
                     indexOfPage > indexOfMustComeBefore)
                 {
-                    // swap the pages
                     Console.WriteLine("  Swapping {0} and {1}", update[indexOfPage], update[indexOfMustComeBefore]);
                     (update[indexOfPage], update[indexOfMustComeBefore]) = (update[indexOfMustComeBefore], update[indexOfPage]);
                     swaps++;
@@ -101,10 +94,7 @@ do
     }
 } while (swaps > 0);
 
-int part2 = 0;
-foreach (var update in invalidUpdates)
-{
-    part2 += update[update.Count / 2];
-}
+int part2 = invalidUpdates.Select(x => x[x.Count / 2]).Sum();
+
 Console.WriteLine();
 Console.WriteLine($"Part 2: fixed after {passes} passes with a checksum of {part2}");
