@@ -157,11 +157,53 @@ public class Grid<T> : IEnumerable<Node<T>>
         }
     }
 
+    /// <summary>
+    /// Returns true if the sequence of the nodes matches for the given function and direction.
+    /// </summary>
+    /// <param name="sequenceToMatch">The sequence to match.</param>
+    /// <param name="startAt">The starting node, this node is compared to the first node in <paramref name="sequenceToMatch"/>.</param>
+    /// <param name="nextNode">The function to get the next node, given the current node.</param>
+    /// <returns>True if the sequence was matched, false otherwise.</returns>
+    public bool SequenceEqual(ReadOnlySpan<T> sequenceToMatch, Node<T> startAt, Func<Node<T>, Node<T>?> nextNode, Func<T, T, bool>? areEqual = default)
+    {
+        areEqual ??= (a, b) => a is not null && a.Equals(b);
+        Node<T>? current = startAt;
+
+        foreach (var test in sequenceToMatch)
+        {
+
+            if (current is null || current.Value is null || test is null)
+            {
+                return false;
+            }
+            
+            //Console.WriteLine($"Testing {test} at {current}");
+            if (!areEqual(current.Value, test))
+            {
+                return false;
+            }
+
+            current = nextNode(current);
+        }
+
+        return true;
+    }
+
     public IEnumerator<Node<T>> GetEnumerator()
         => Nodes().GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator()
         => GetEnumerator();
+
+    public Node<T>? Up(Node<T> node) => this[node.X, node.Y - 1];
+    public Node<T>? Down(Node<T> node) => this[node.X, node.Y + 1];
+    public Node<T>? Left(Node<T> node) => this[node.X - 1, node.Y];
+    public Node<T>? Right(Node<T> node) => this[node.X + 1, node.Y];
+    public Node<T>? UpRight(Node<T> node) => this[node.X + 1, node.Y - 1];
+    public Node<T>? UpLeft(Node<T> node) => this[node.X - 1, node.Y - 1];
+    public Node<T>? DownRight(Node<T> node) => this[node.X + 1, node.Y + 1];
+    public Node<T>? DownLeft(Node<T> node) => this[node.X - 1, node.Y + 1];
+
 }
 
 public static class GridExtensions
@@ -195,6 +237,50 @@ public static class GridExtensions
         for (var i = node.X + 1; i < grid.Width; i++)
         {
             yield return grid[i, node.Y]!;
+        }
+    }
+
+    public static IEnumerable<T> UpLeftFrom<T>(this Grid<T> grid, Node<T> node)
+    {
+        for (var x = node.X - 1; x >= 0; x--)
+        {
+            for (var y = node.Y - 1; y >= 0; y--)
+            {
+                yield return grid[x, y]!;
+            }
+        }
+    }
+
+    public static IEnumerable<T> UpRightFrom<T>(this Grid<T> grid, Node<T> node)
+    {
+        for (var x = node.X + 1; x < grid.Width; x++)
+        {
+            for (var y = node.Y - 1; y >= 0; y--)
+            {
+                yield return grid[x, y]!;
+            }
+        }
+    }
+
+    public static IEnumerable<T> DownLeftFrom<T>(this Grid<T> grid, Node<T> node)
+    {
+        for (var x = node.X - 1; x >= 0; x--)
+        {
+            for (var y = node.Y + 1; y < grid.Height; y++)
+            {
+                yield return grid[x, y]!;
+            }
+        }
+    }
+
+    public static IEnumerable<T> DownRightFrom<T>(this Grid<T> grid, Node<T> node)
+    {
+        for (var x = node.X + 1; x < grid.Width; x++)
+        {
+            for (var y = node.Y + 1; y < grid.Height; y++)
+            {
+                yield return grid[x, y]!;
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Immutable;
 
+namespace Day00;
 public class SimulationGrid<T> : IEnumerable<Node<T>>
 {
     private readonly List<Node<T>> entities;

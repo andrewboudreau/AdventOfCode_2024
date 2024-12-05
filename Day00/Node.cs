@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
+namespace Day00;
 public class Node<T> : IEqualityComparer<T>, IEquatable<T>
 {
     private readonly List<Node<T>> neighbors;

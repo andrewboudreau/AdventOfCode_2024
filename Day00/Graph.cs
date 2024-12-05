@@ -1,4 +1,7 @@
 ﻿using System.Collections;
+
+namespace Day00;
+
 public class Graph<T> : IEnumerable<Node<T>>
 {
     private readonly HashSet<Node<T>> nodes;

@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace Day00;
+﻿namespace Day00;
 
 public static class StringParseExtensions
 {
