@@ -24,7 +24,7 @@ public static class ReadInputs
 
     public static void Read(Action<string> action)
     {
-        foreach (var line in Read().TakeWhile(x => !string.IsNullOrEmpty(x)))
+        foreach (var line in Read().TakeWhile(x => x != null))
         {
             action(line!);
         }

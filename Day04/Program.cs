@@ -27,7 +27,7 @@ foreach (var node in grid.Nodes())
     // If it is an A check if th the 4 diagonal corners are M, and S respectively
     // If they are, then we have found a the 'X' MAS
 
-    if (node.Value == 'A')
+    if (node == 'A')
     {
         var upLeft = grid.UpLeft(node);
         var downRight = grid.DownRight(node);
