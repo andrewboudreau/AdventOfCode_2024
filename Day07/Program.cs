@@ -1,7 +1,6 @@
-﻿// https://adventofcode.com/2024/day/7
-// part1: 6083020304036
+﻿using System.Numerics;
 
-using System.Numerics;
+// https://adventofcode.com/2024/day/7
 
 var equations = Read(line =>
 {
@@ -14,8 +13,29 @@ var equations = Read(line =>
     return new Equation(operands, BigInteger.Parse(parts[0]));
 }).ToArray();
 
+BigInteger checksum = 0;
+Lock lockObj = new();
+
+// Parallel Solution
+Parallel.ForEach(equations, candidate =>
+{
+    foreach (var operators in candidate.OperatorPermutations())
+    {
+        if (candidate.Evaluate(operators) == candidate.Result)
+        {
+            using (lockObj.EnterScope())
+            {
+                checksum = BigInteger.Add(checksum, candidate.Result);
+            };
+            break;
+        }
+    }
+});
+Console.WriteLine("{0} : is the checksum", checksum);
+
+// Sequential Solution
+checksum = 0;
 int count = 0;
-BigInteger part1 = 0;
 foreach (var candidate in equations)
 {
     foreach (var operators in candidate.OperatorPermutations())
@@ -26,34 +46,36 @@ foreach (var candidate in equations)
             var eq = candidate.Operands
                 .Zip(
                     operators,
-                    (operand, operation) => $"{operand}{(operation == Operator.Add ? "+" : "*")}")
+                    (operand, operation) =>
+                        $"{operand}{OperatorToString(operation)}")
                 .Append(candidate.Operands.Last().ToString())
                 .ToList();
             Console.WriteLine(string.Join("", eq));
 
-            part1 += candidate.Result;
+            checksum += candidate.Result;
             count++;
             break;
         }
     }
 }
-
-Console.WriteLine("{0} : is the Part1 checksum", part1);
+Console.WriteLine("{0} : is the checksum", checksum);
 Console.WriteLine("Found {0} solvable inputs", count);
 
-enum Operator { Add, Multiply }
-
-class Equation
+static string OperatorToString(Operator op) => op switch
 {
-    public Equation(IEnumerable<int> operands, BigInteger result)
-    {
-        Operands = operands.ToArray();
-        Result = result;
-    }
+    Operator.Add => "+",
+    Operator.Multiply => "*",
+    Operator.Concatenate => "||",
+    _ => throw new ArgumentOutOfRangeException(nameof(op), "Invalid operator encountered")
+};
 
-    public int[] Operands { get; }
+enum Operator { Add, Multiply, Concatenate }
 
-    public BigInteger Result { get; }
+class Equation(IEnumerable<int> operands, BigInteger result)
+{
+    public int[] Operands { get; } = operands.ToArray();
+
+    public BigInteger Result { get; } = result;
 
     public IEnumerable<Operator[]> OperatorPermutations() => OperatorPermutations(Operands);
 
@@ -64,16 +86,18 @@ class Equation
         {
             result = operators[i] switch
             {
-                Operator.Add => result + Operands[i + 1],
-                Operator.Multiply => result * Operands[i + 1],
+                Operator.Add => BigInteger.Add(result, Operands[i + 1]),
+                Operator.Multiply => BigInteger.Multiply(result, Operands[i + 1]),
+                Operator.Concatenate => BigInteger.Parse($"{result}{Operands[i + 1]}"),
                 _ => throw new ArgumentOutOfRangeException(nameof(operators), "Invalid operator encountered")
             };
 
             if (result > Result)
             {
-                return result;
+                return int.MinValue;
             }
         }
+
         return result;
     }
 
