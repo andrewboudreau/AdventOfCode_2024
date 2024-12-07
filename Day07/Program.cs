@@ -16,7 +16,7 @@ var equations = Read(line =>
 
 int count = 0;
 BigInteger part1 = 0;
-foreach (var candidate in equations.Where(x => x.IsValid))
+foreach (var candidate in equations)
 {
     foreach (var operators in candidate.OperatorPermutations())
     {
@@ -49,20 +49,11 @@ class Equation
     {
         Operands = operands.ToArray();
         Result = result;
-        MinPossibleValue = Operands.Sum();
-        MaxPossibleValue = Operands.Aggregate(BigInteger.One, (a, b) => BigInteger.Multiply(a, b));
-        IsValid = Result >= MinPossibleValue && Result <= MaxPossibleValue;
     }
 
     public int[] Operands { get; }
 
     public BigInteger Result { get; }
-
-    public BigInteger MaxPossibleValue { get; }
-
-    public int MinPossibleValue { get; }
-
-    public bool IsValid { get; }
 
     public IEnumerable<Operator[]> OperatorPermutations() => OperatorPermutations(Operands);
 
@@ -108,7 +99,7 @@ class Equation
     {
         var sb = new StringBuilder();
         sb.AppendLine(
-            $"{(IsValid ? "Valid" : "Invalid")} {string.Join(" ", Operands)} = {Result}, [{MinPossibleValue},{MaxPossibleValue}]");
+            $"{string.Join(" ", Operands)} = {Result}");
         sb.AppendLine("Operator Combinations:");
         sb.AppendLine(string.Join(Environment.NewLine, OperatorPermutations().Select(x => string.Join(" ", x))));
 
