@@ -53,7 +53,7 @@ public class Line(int x1, int y1, int x2, int y2)
     /// <param name="coords">The separator for the coordinates</param>
     /// <returns>an integer line from the input string</returns>
     public static Line Create(string input, string points, char coords)
-        => new(input.Split(points, StringSplitOptions.TrimEntries).Split(coords).ToArray());
+        => new(input.Split(points, StringSplitOptions.TrimEntries).SplitToInts(coords).ToArray());
 
     public static Line Create(string input)
         => Create(input, "->", ',');
