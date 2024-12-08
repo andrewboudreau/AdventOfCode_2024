@@ -54,6 +54,11 @@ public class Grid<T> : IEnumerable<Node<T>>
         }
     }
 
+    public Node<T>? this[(int X, int Y) position]
+    {
+        get => this[position.X, position.Y];
+    }
+
     public int Width => width;
     public int Height => height;
 
