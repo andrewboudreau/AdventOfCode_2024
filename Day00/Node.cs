@@ -110,6 +110,9 @@ public class Node<T> : IEqualityComparer<T>, IEquatable<T>
     public void AddNeighbor(Node<T> neighbor)
         => neighbors.Add(neighbor);
 
+    public void AddNeighbors(params Node<T>[] nodes)
+        => neighbors.AddRange(nodes);
+
     public void Deconstruct(out int x, out int y, out T value)
     {
         x = X;
