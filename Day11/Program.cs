@@ -20,7 +20,40 @@ using System.Numerics;
 var stones = new LinkedList<BigInteger>(Read().First()!.Split(' ').Select(BigInteger.Parse));
 Console.WriteLine(string.Join(" ", stones));
 
-var blinks = 75;
+var blinks = 25;
+var memorize = new Dictionary<int, BigInteger>();
+foreach (var stone in stones)
+{
+    var foo = new LinkedList<BigInteger>([stone]);
+    for (var blink = 0; blink < blinks; blink++)
+    {
+        var current = foo.First;
+        while (current != null)
+        {
+            if (current.Value == 0)
+            {
+                current.Value = 1;
+                current = current.Next;
+            }
+            else if (current.Value.ToString().Length % 2 == 0)
+            {
+                var mid = current.Value.ToString().Length / 2;
+                var left = BigInteger.Parse(current.Value.ToString()[..mid]);
+                var right = BigInteger.Parse(current.Value.ToString()[mid..]);
+
+                current.Value = left;
+                current = stones.AddAfter(current, right).Next;
+            }
+            else
+            {
+                current.Value *= 2024;
+                current = current.Next;
+            }
+        }
+        memorize.Add(stone, foo.Count);
+    }
+}
+
 for (var blink = 0; blink < blinks; blink++)
 {
     var stone = stones.First;
@@ -49,3 +82,4 @@ for (var blink = 0; blink < blinks; blink++)
 
     Console.WriteLine("There are " + stones.Count + " stones after " + (blink + 1) + " blinks.");
 }
+
