@@ -181,7 +181,7 @@ public class Grid<T> : IEnumerable<Node<T>>
             {
                 return false;
             }
-            
+
             //Console.WriteLine($"Testing {test} at {current}");
             if (!areEqual(current.Value, test))
             {
@@ -208,7 +208,6 @@ public class Grid<T> : IEnumerable<Node<T>>
     public Node<T>? UpLeft(Node<T> node) => this[node.X - 1, node.Y - 1];
     public Node<T>? DownRight(Node<T> node) => this[node.X + 1, node.Y + 1];
     public Node<T>? DownLeft(Node<T> node) => this[node.X - 1, node.Y + 1];
-
 }
 
 public static class GridExtensions
@@ -294,6 +293,50 @@ public static class GridExtensions
 
     public static void ResetDistances<T>(this Grid<T> grid)
         => grid.Each(node => node.ResetDistance());
+
+    public static IEnumerable<List<Node<T>>> GetRegions<T>(this Grid<T> grid)
+    {
+        foreach (var node in grid.Nodes())
+        {
+            if (node.IsVisited)
+            {
+                continue;
+            }
+
+            node.Visit();
+            List<Node<T>> region = [node];
+            var queue = new Queue<Node<T>>(region);
+            while (queue.TryDequeue(out var current))
+            {
+                foreach (var neighbor in grid.Neighbors(current, withDiagonals: false))
+                {
+                    if (neighbor.IsVisited)
+                    {
+                        continue;
+                    }
+
+                    if (neighbor.Value is null)
+                    {
+                        throw new InvalidOperationException("Value cannot be null");
+                    }
+
+                    if (neighbor.Value.Equals(current.Value))
+                    {
+                        neighbor.Visit();
+                        region.Add(neighbor);
+                        queue.Enqueue(neighbor);
+                    }
+                }
+            }
+
+            yield return region;
+        }
+    }
+
+    public static void SetNeighbors<T>(this Grid<T> grid, bool withDiagonals = false)
+    {
+        grid.Each(n => n.AddNeighbors([.. grid.Neighbors(n, withDiagonals)]));
+    }
 }
 
 public static class GridRenderExtensions
