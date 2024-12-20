@@ -1,7 +1,6 @@
 ﻿// https://adventofcode.com/2024/day/17
 
 using System.Numerics;
-using System.Xml;
 
 int[] program = default!;
 
