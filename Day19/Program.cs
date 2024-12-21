@@ -1,10 +1,8 @@
 ﻿// https://adventofcode.com/2024/day/19
 
-//300 is too low
-//318 is too high
-
 var input = Read()!.ToList();
-var towels = input[0]!.Split(",", StringSplitOptions.TrimEntries).Select(x => x.ToCharArray()).ToHashSet();
+
+HashSet<string> towels = [.. input[0]!.Split(",", StringSplitOptions.TrimEntries)];
 List<string> designs = [.. input.Skip(2).Select(x => x!)];
 
 var largestTowel = towels.Max(x => x.Length);
@@ -31,17 +29,17 @@ Console.WriteLine($"There are {possible} possible designs.");
 
 
 /// A design is possible if the towels can be arranged in such a way that the design can be seen.
-bool IsPossibleDesign(HashSet<char[]> towels, string design)
+bool IsPossibleDesign(HashSet<string> towels, string design)
 {
     //Console.WriteLine($"attempting to match {string.Join("", design)}");
-    if (failed.Contains(design))
-    {
-        return false;
-    }
-
     if (design.Length == 0)
     {
         return true;
+    }
+    
+    if (failed.Contains(design))
+    {
+        return false;
     }
 
     for (var i = Math.Min(largestTowel, design.Length); i >= 0; i--)
