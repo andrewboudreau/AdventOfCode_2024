@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Immutable;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Day00;
 public class SimulationGrid<T> : IEnumerable<Node<T>>

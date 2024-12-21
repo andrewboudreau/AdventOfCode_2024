@@ -50,6 +50,11 @@ public class Node<T> : IEqualityComparer<T>, IEquatable<T>
         Distance = int.MaxValue;
     }
 
+    public void ClearNeighbors()
+    {
+        neighbors.Clear();
+    }
+
     public long SetDistance(long distance)
     {
         Visit();

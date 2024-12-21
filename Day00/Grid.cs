@@ -294,6 +294,9 @@ public static class GridExtensions
     public static void ResetDistances<T>(this Grid<T> grid)
         => grid.Each(node => node.ResetDistance());
 
+    public static void ClearNeighbors<T>(this Grid<T> grid)
+        => grid.Each(node => node.ClearNeighbors());
+
     public static IEnumerable<List<Node<T>>> GetRegions<T>(this Grid<T> grid)
     {
         foreach (var node in grid.Nodes())
@@ -335,6 +338,8 @@ public static class GridExtensions
 
     public static void SetNeighbors<T>(this Grid<T> grid, Func<Node<T>, bool>? include = default, bool withDiagonals = false)
     {
+        grid.Each(n => n.ClearNeighbors());
+
         include ??= _ => true;
         grid.Each(n => n.AddNeighbors([.. grid.Neighbors(n, withDiagonals).Where(include)]));
     }
