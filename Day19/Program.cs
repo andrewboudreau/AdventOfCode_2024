@@ -12,34 +12,42 @@ Console.WriteLine($"Largest towel is {largestTowel}");
 
 var failed = new HashSet<string>();
 var possible = 0;
+long options = 0;
+var anyFound = false;
+
 foreach (var design in designs)
 {
+    anyFound = false;
+    Console.WriteLine($"attempting to match {string.Join("", design)}");
     if (IsPossibleDesign(towels, design))
     {
         //Console.WriteLine($"Design {design} is possible.");
+        //Console.WriteLine(design);
+        Console.WriteLine("Options: " + options);
         possible++;
     }
     else
     {
-        //Console.WriteLine($"-NOT possible Design {design} is not possible.");
+        Console.WriteLine($"-NOT possible Design {design} is not possible.");
     }
 }
 
-Console.WriteLine($"There are {possible} possible designs.");
+Console.WriteLine($"There are {possible} possible designs with a total of {options} options.");
 
 
 /// A design is possible if the towels can be arranged in such a way that the design can be seen.
 bool IsPossibleDesign(HashSet<string> towels, string design)
 {
-    //Console.WriteLine($"attempting to match {string.Join("", design)}");
-    if (design.Length == 0)
-    {
-        return true;
-    }
-    
     if (failed.Contains(design))
     {
         return false;
+    }
+
+    var isPossible = false;
+    if (design.Length == 0)
+    {
+        options++;
+        return true;
     }
 
     for (var i = Math.Min(largestTowel, design.Length); i >= 0; i--)
@@ -50,11 +58,15 @@ bool IsPossibleDesign(HashSet<string> towels, string design)
             //Console.WriteLine($"Matched {string.Join("", test)}");
             if (IsPossibleDesign(towels, design[test.Length..]))
             {
-                return true;
+                isPossible = true;
+                anyFound = true;
+            }
+            else
+            {
+                failed.Add(design);
             }
         }
     }
 
-    failed.Add(design);
-    return false;
+    return anyFound;
 }
