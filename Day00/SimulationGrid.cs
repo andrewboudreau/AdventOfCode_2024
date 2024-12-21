@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Immutable;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Day00;
 public class SimulationGrid<T> : IEnumerable<Node<T>>
@@ -260,7 +261,7 @@ public class SimulationGrid<T> : IEnumerable<Node<T>>
         foreach (var node in keys)
         {
             if (node is null)
-                throw new NullReferenceException($"node is null at key {node.X},{node.Y}");
+                throw new NullReferenceException($"node is null at key {node?.X},{node?.Y}");
 
             update(this, node, step);
         }
@@ -339,34 +340,39 @@ public static class SimulationGridExtensions
 
 public static class SimulationGridRenderExtensions
 {
-    public static void Render<T>(this SimulationGrid<T> grid, Action<Node<T>, Action<string>> drawCell, Action<string>? draw = default)
+    public static void Render<T>(this SimulationGrid<T> grid, Action<Node<T>, Action<string>> drawCell, Action<string?>? draw = default)
     {
         draw ??= Console.Write;
         foreach (var row in grid.Viewport())
         {
             foreach (var node in row)
             {
-                drawCell(node, draw);
+                drawCell(node!, draw);
             }
 
             draw(Environment.NewLine);
         }
     }
 
-    public static void Render<T>(this SimulationGrid<T> grid, Dictionary<(int X, int Y), string> display, Action<string>? draw = default)
+    public static void Render<T>(this SimulationGrid<T> grid, Dictionary<(int X, int Y), string> display, Action<string?>? draw = default)
     {
         draw ??= Console.Write;
         foreach (var row in grid.Viewport())
         {
             foreach (var node in row)
             {
+                if (node is null)
+                {
+                    throw new NullReferenceException("node is null");
+                }
+
                 if (display.TryGetValue((node.X, node.Y), out var sprite))
                 {
                     draw(sprite);
                 }
                 else
                 {
-                    draw(node.Value.ToString());
+                    draw(node.Value?.ToString());
                 }
             }
 
@@ -390,7 +396,7 @@ public static class SimulationGridRenderExtensions
         draw ??= Console.WriteLine;
         foreach (var row in grid.Viewport())
         {
-            draw(string.Join("", row.Select(x => x.Value)));
+            draw(string.Join("", row.Select(x => x!.Value)));
             //draw(string.Join("", row.Select(x => $"({x.X},{x.Y})[{x.Value}]")));
         }
     }

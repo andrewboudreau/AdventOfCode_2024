@@ -333,9 +333,10 @@ public static class GridExtensions
         }
     }
 
-    public static void SetNeighbors<T>(this Grid<T> grid, bool withDiagonals = false)
+    public static void SetNeighbors<T>(this Grid<T> grid, Func<Node<T>, bool>? include = default, bool withDiagonals = false)
     {
-        grid.Each(n => n.AddNeighbors([.. grid.Neighbors(n, withDiagonals)]));
+        include ??= _ => true;
+        grid.Each(n => n.AddNeighbors([.. grid.Neighbors(n, withDiagonals).Where(include)]));
     }
 }
 
@@ -378,7 +379,7 @@ public static class GridRenderExtensions
         }
     }
 
-    public static void Render<T>(this Grid<T> grid, Dictionary<(int X, int Y), string> display, Action<string>? draw = default)
+    public static void Render<T>(this Grid<T> grid, Dictionary<(int X, int Y), string> display, Action<string?>? draw = default)
     {
         draw ??= Console.Write;
         foreach (var row in grid.Rows())
@@ -391,7 +392,7 @@ public static class GridRenderExtensions
                 }
                 else
                 {
-                    draw(node.Value.ToString());
+                    draw(node.Value?.ToString());
                 }
             }
 
