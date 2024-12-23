@@ -28,21 +28,22 @@ for (var i = 0; i < moves.Count; i++)
     Move();
     Console.Clear();
     grid.Render(null);
-    Thread.Sleep(10);
+    Thread.Sleep(100);
 }
 grid.Render(null);
 Console.WriteLine($"Steps: {steps}");
 Console.WriteLine($"Goods: {GetAllGoods().Sum(box => (box.Y * 100) + box.X)}");
 
-IEnumerable<Node<char>> RayCast()
+IEnumerable<Node<char>> RayCast(char? move = default, Node<char>? from = default)
 {
-    var move = moves[currentMove];
+    from ??= player;
+    move ??= moves[currentMove];
     return move switch
     {
-        '<' => grid.LeftFrom(player),
-        '>' => grid.RightFrom(player),
-        'v' => grid.DownFrom(player),
-        '^' => grid.UpFrom(player),
+        '<' => grid.LeftFrom(from),
+        '>' => grid.RightFrom(from),
+        'v' => grid.DownFrom(from),
+        '^' => grid.UpFrom(from),
         _ => throw new InvalidOperationException("")
     };
 }
@@ -71,6 +72,87 @@ bool Move()
         for (int i = firstEmptyIndex; i > playerIndex; i--)
         {
             ray[i].SetValue(ray[i - 1].Value);
+        }
+    }
+
+    candidatePosition.SetValue('@');
+    player.SetValue('.');
+    player = candidatePosition;
+
+    return true;
+}
+
+bool Move2()
+{
+    var move = moves[currentMove];
+    var ray = RayCast(move, player).ToList();
+    var leftRay = RayCast(move, grid.Left(player)).ToList();
+    var rightRay = RayCast(move, grid.Right(player)).ToList(); 
+
+    var candidatePosition = ray.First();
+    currentMove = (currentMove + 1) % moves.Count;
+
+    if (candidatePosition == '#')
+    {
+        return false;
+    }
+    else if (candidatePosition == '[' || candidatePosition == ']')
+    {
+        var firstOption = ray.First(n => n == '#' || n == '.');
+        if (firstOption == '#')
+        {
+            return false;
+        }
+
+        if (move == '<' || move == '>')
+        {
+            var playerIndex = ray.IndexOf(candidatePosition);
+            var firstEmptyIndex = ray.IndexOf(firstOption);
+
+            for (int i = firstEmptyIndex; i > playerIndex; i--)
+            {
+                ray[i].SetValue(ray[i - 1].Value);
+            }
+        }
+        else if (candidatePosition == '[')
+        {
+            var otherNode = grid[(player.X + 1), player.Y];
+            var otherRay = RayCast(move, otherNode).ToList();
+            var otherFirstOption = otherRay.First(n => n == '#' || n == '.');
+            if (otherFirstOption == '#')
+            {
+                return false;
+            }
+
+            var playerIndex = ray.IndexOf(candidatePosition);
+            var firstEmptyIndex = ray.IndexOf(firstOption);
+            
+            for (int i = firstEmptyIndex; i > playerIndex; i--)
+            {
+                ray[i].SetValue(ray[i - 1].Value);
+                otherRay[i].SetValue(otherRay[i - 1].Value);
+            }
+            grid[candidatePosition.X + 1, candidatePosition.Y]!.SetValue('.');
+        }
+        else if (candidatePosition == ']')
+        {
+            var otherNode = grid[player.X - 1, player.Y];
+            var otherRay = RayCast(move, otherNode).ToList();
+            var otherFirstOption = otherRay.First(n => n == '#' || n == '.');
+            if (otherFirstOption == '#')
+            {
+                return false;
+            }
+
+            var playerIndex = ray.IndexOf(candidatePosition);
+            var firstEmptyIndex = ray.IndexOf(firstOption);
+
+            for (int i = firstEmptyIndex; i > playerIndex; i--)
+            {
+                ray[i].SetValue(ray[i - 1].Value);
+                otherRay[i].SetValue(otherRay[i - 1].Value);
+            }
+            grid[candidatePosition.X - 1, candidatePosition.Y]!.SetValue('.');
         }
     }
 

@@ -8,9 +8,21 @@
       "commandName": "Project",
       "commandLineArgs": "sample2.txt"
     },
+    "Sample3": {
+      "commandName": "Project",
+      "commandLineArgs": "sample3.txt"
+    },
+    "Sample4": {
+      "commandName": "Project",
+      "commandLineArgs": "sample4.txt"
+    },
     "Problem": {
       "commandName": "Project",
       "commandLineArgs": "problem.txt"
+    },
+    "Problem2": {
+      "commandName": "Project",
+      "commandLineArgs": "problem2.txt"
     },
     "WSL": {
       "commandName": "WSL2",
