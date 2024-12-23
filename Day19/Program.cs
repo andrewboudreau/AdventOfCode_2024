@@ -19,7 +19,7 @@ foreach (var design in designs)
 {
     anyFound = false;
     Console.WriteLine($"attempting to match {string.Join("", design)}");
-    if (IsPossibleDesign(towels, design))
+    if (IsPossibleDesign(towels, design) > 0)
     {
         //Console.WriteLine($"Design {design} is possible.");
         //Console.WriteLine(design);
@@ -36,18 +36,18 @@ Console.WriteLine($"There are {possible} possible designs with a total of {optio
 
 
 /// A design is possible if the towels can be arranged in such a way that the design can be seen.
-bool IsPossibleDesign(HashSet<string> towels, string design)
+int IsPossibleDesign(HashSet<string> towels, string design)
 {
+    int count = 0;
     if (failed.Contains(design))
     {
-        return false;
+        return 0;
     }
 
     var isPossible = false;
     if (design.Length == 0)
     {
-        options++;
-        return true;
+        return 1;
     }
 
     for (var i = Math.Min(largestTowel, design.Length); i >= 0; i--)
@@ -56,7 +56,7 @@ bool IsPossibleDesign(HashSet<string> towels, string design)
         foreach (var towel in towels.Where(t => t.SequenceEqual(test)))
         {
             //Console.WriteLine($"Matched {string.Join("", test)}");
-            if (IsPossibleDesign(towels, design[test.Length..]))
+            if (IsPossibleDesign(towels, design[test.Length..]) > 0)
             {
                 isPossible = true;
                 anyFound = true;
@@ -68,5 +68,5 @@ bool IsPossibleDesign(HashSet<string> towels, string design)
         }
     }
 
-    return anyFound;
+    return count;
 }
