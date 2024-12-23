@@ -34,50 +34,52 @@ int TotalDistance()
     return total;
 }
 
-var min = int.MaxValue;
-for (var i = 0; i < 10_000; i++)
-{
-    var current = TotalDistance();
-    if (current < min)
-    {
-        Console.WriteLine($"New min was found, down from {min} to {current} after {i} iterations");
-        min = current;
-    }
-
-    StepAll();
-}
-
-//var step = 0;
-//for (var i = 0; i < min; i++)
+//var min = int.MaxValue;
+//for (var i = 0; i < 7820; i++)
 //{
-//    StepAll();
-//    step = i;
-//}
-Render();
-
-//while (true)
-//{
-//    Console.WriteLine($"current step is {step} - Press 1, 2, 3, or 4 to advance 1, 10, 20, or 50 steps respectively, or any other key to exit.");
-//    var key = Console.ReadKey(intercept: true).KeyChar;
-
-//    int steps = key switch
+//    var current = TotalDistance();
+//    if (current < min)
 //    {
-//        '1' => 1,
-//        '2' => 10,
-//        '3' => 20,
-//        '4' => 50,
-//        _ => 0
-//    };
-//    step += steps;
-//    if (steps == 0) break;
-
-//    for (int i = 0; i < steps; i++)
-//    {
-//        StepAll();
+//        Console.WriteLine($"New min was found, down from {min} to {current} after {i} iterations");
+//        min = current;
 //    }
 
-//    Render();
+//    StepAll();
+    
 //}
+
+var step = 0;
+for (var i = 0; i < 7135; i++)
+{
+    StepAll();
+    step = i;
+}
+Render();
+
+while (true)
+{
+    Console.WriteLine($"current step is {step} - Press 1, 2, 3, or 4 to advance 1, 10, 20, or 50 steps respectively, or any other key to exit.");
+    var key = Console.ReadKey(intercept: true).KeyChar;
+
+    int steps = key switch
+    {
+        '1' => 1,
+        '2' => 10,
+        '3' => 20,
+        '4' => 50,
+        '5'=> -1,
+        _ => 0
+    };
+    step += steps;
+    if (steps == 0) break;
+
+    for (int i = 0; i < steps; i++)
+    {
+        StepAll();
+    }
+
+    Render();
+}
 
 void StepAll() => Parallel.ForEach(robots, robot => robot.Move());
 

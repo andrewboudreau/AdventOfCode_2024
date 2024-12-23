@@ -212,7 +212,7 @@ public class Grid<T> : IEnumerable<Node<T>>
 
 public static class GridExtensions
 {
-    public static IEnumerable<T> UpFrom<T>(this Grid<T> grid, Node<T> node)
+    public static IEnumerable<Node<T>> UpFrom<T>(this Grid<T> grid, Node<T> node)
     {
         for (var i = node.Y - 1; i >= 0; i--)
         {
@@ -220,7 +220,7 @@ public static class GridExtensions
         }
     }
 
-    public static IEnumerable<T> DownFrom<T>(this Grid<T> grid, Node<T> node)
+    public static IEnumerable<Node<T>> DownFrom<T>(this Grid<T> grid, Node<T> node)
     {
         for (var i = node.Y + 1; i < grid.Height; i++)
         {
@@ -228,7 +228,7 @@ public static class GridExtensions
         }
     }
 
-    public static IEnumerable<T> LeftFrom<T>(this Grid<T> grid, Node<T> node)
+    public static IEnumerable<Node<T>> LeftFrom<T>(this Grid<T> grid, Node<T> node)
     {
         for (var i = node.X - 1; i >= 0; i--)
         {
@@ -236,7 +236,7 @@ public static class GridExtensions
         }
     }
 
-    public static IEnumerable<T> RightFrom<T>(this Grid<T> grid, Node<T> node)
+    public static IEnumerable<Node<T>> RightFrom<T>(this Grid<T> grid, Node<T> node)
     {
         for (var i = node.X + 1; i < grid.Width; i++)
         {
@@ -244,7 +244,7 @@ public static class GridExtensions
         }
     }
 
-    public static IEnumerable<T> UpLeftFrom<T>(this Grid<T> grid, Node<T> node)
+    public static IEnumerable<Node<T>> UpLeftFrom<T>(this Grid<T> grid, Node<T> node)
     {
         for (var x = node.X - 1; x >= 0; x--)
         {
@@ -255,7 +255,7 @@ public static class GridExtensions
         }
     }
 
-    public static IEnumerable<T> UpRightFrom<T>(this Grid<T> grid, Node<T> node)
+    public static IEnumerable<Node<T>> UpRightFrom<T>(this Grid<T> grid, Node<T> node)
     {
         for (var x = node.X + 1; x < grid.Width; x++)
         {
