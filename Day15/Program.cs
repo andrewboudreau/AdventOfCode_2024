@@ -35,9 +35,7 @@ for (var i = 0; i < moves.Count; i++)
 }
 grid.Render(null);
 Console.WriteLine($"Steps: {steps}");
-
-//Console.WriteLine($"Part 1 Goods: {GetAllGoods().Sum(box => (box.Y * 100) + box.X)}");
-Console.WriteLine($"Part 2 Goods: {GetAllGoods().Sum(LargeBoxPosition)}");
+Console.WriteLine($"Goods Position: {GetAllGoods().Sum(box => (box.Y * 100) + box.X)} should equal 1489116 for part 2");
 
 IEnumerable<Node<char>> RayCast(char? move = default, Node<char>? from = default)
 {
@@ -228,23 +226,5 @@ bool Move()
     player = candidatePosition;
 
     return true;
-}
-
-int LargeBoxPosition(Node<char> good)
-{
-    var w = good.X;// Math.Min(good.X, grid.Width - (good.X + 1));
-    if (w <= 0)
-    {
-        throw new InvalidOperationException("");
-    }
-
-    var h = good.Y;// Math.Min(good.Y, (grid.Height-1)- good.Y);
-    if (h <= 0)
-    {
-        throw new InvalidOperationException("");
-    }
-    Console.WriteLine($"The output was calculated by h:{good.Y} * 100 + w:{w} = {h * 100 + w}");
-
-    return (good.Y * 100) + w;
 }
 
