@@ -347,6 +347,9 @@ public static class GridExtensions
 
 public static class GridRenderExtensions
 {
+    public static void RenderDistances<T>(this Grid<T> grid)
+        => grid.Render((n, draw) => draw((n.Distance % 10).ToString()), null);
+
     public static void Render<T>(this Grid<T> grid, Action<Node<T>, Action<string>> drawCell, Action<string>? draw = default)
     {
         draw ??= Console.Write;
