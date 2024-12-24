@@ -22,17 +22,22 @@ RenderPlayer(player);
 
 grid.Render(null);
 var steps = 0;
+
 for (var i = 0; i < moves.Count; i++)
 {
     steps++;
-    Move();
-    Console.Clear();
-    grid.Render(null);
-    Thread.Sleep(100);
+    player = MovePlayer(moves[currentMove], player);
+    currentMove = (currentMove + 1) % moves.Count;
+
+    //Console.Clear();
+    //grid.Render(null);
+    //Thread.Sleep(10);
 }
 grid.Render(null);
 Console.WriteLine($"Steps: {steps}");
-Console.WriteLine($"Goods: {GetAllGoods().Sum(box => (box.Y * 100) + box.X)}");
+
+//Console.WriteLine($"Part 1 Goods: {GetAllGoods().Sum(box => (box.Y * 100) + box.X)}");
+Console.WriteLine($"Part 2 Goods: {GetAllGoods().Sum(LargeBoxPosition)}");
 
 IEnumerable<Node<char>> RayCast(char? move = default, Node<char>? from = default)
 {
@@ -47,6 +52,149 @@ IEnumerable<Node<char>> RayCast(char? move = default, Node<char>? from = default
         _ => throw new InvalidOperationException("")
     };
 }
+
+(bool CanMove, IReadOnlyList<Node<char>> Touching) CanMove(char move, Node<char> from)
+{
+    var next = RayCast(move, from).First();
+    if (next == '#')
+    {
+        return (false, []);
+    }
+
+    else if (next == '.')
+    {
+        return (true, [from]);
+    }
+
+    else if (next == '[' || next == ']')
+    {
+        var isPushingUp = move == '^';
+        var otherBoxSideOffset = next == '[' ? 1 : -1;
+
+        List<Node<char>> touching = [from];
+        var impactedBoxHalf = CanMove(move, next);
+        var otherBoxHalf = CanMove(move, grid[next.X + otherBoxSideOffset, next.Y]!);
+
+        if (impactedBoxHalf.CanMove && otherBoxHalf.CanMove)
+        {
+            return (true, OrderNodesForDrawUpdate(isPushingUp, [from, .. impactedBoxHalf.Touching, .. otherBoxHalf.Touching]));
+        }
+
+        return (false, []);
+    }
+
+    static IReadOnlyList<Node<char>> OrderNodesForDrawUpdate(bool isPushingUp, IEnumerable<Node<char>> nodes)
+    {
+        return isPushingUp ?
+            [.. nodes.OrderBy(n => n.Y).ThenBy(n => n.X).Distinct()] :
+            [.. nodes.OrderByDescending(n => n.Y).ThenBy(n => n.X).Distinct()];
+    }
+
+    throw new InvalidOperationException($"Cannot handle char = '{next}'");
+}
+
+Node<char> MovePlayer(char move, Node<char> player)
+{
+    var ray = RayCast(move, player).ToList();
+    var candidatePosition = ray.First();
+
+    if (candidatePosition == '#')
+    {
+        return player;
+    }
+
+    if (candidatePosition == '.')
+    {
+        return MovePlayerTo(player, candidatePosition);
+    }
+
+
+    if ((move == '<' || move == '>'))
+    {
+        var search = ray.First(n => n == '#' || n == '.');
+        if (search == '#')
+        {
+            return player;
+        }
+        else
+        {
+            var playerIndex = ray.IndexOf(candidatePosition);
+            var firstEmptyIndex = ray.IndexOf(ray.First(n => n == '.'));
+            for (int i = firstEmptyIndex; i > playerIndex; i--)
+            {
+                ray[i].SetValue(ray[i - 1].Value);
+            }
+        }
+    }
+    else if ((move == 'v' || move == '^'))
+    {
+        var result = CanMove(move, player);
+        //Console.Clear();
+        //grid.Render((node, draw) =>
+        //{
+        //    if (result.Touching.Contains(node))
+        //    {
+        //        draw((tick++ % 10).ToString());
+        //    }
+        //    else
+        //    {
+        //        draw(node.Value.ToString());
+        //    }
+        //}, null);
+
+        if (result.CanMove)
+        {
+            var direction = move == 'v' ? 1 : -1;
+
+            // move any node in touching one in the move direction
+            foreach (var source in result.Touching)
+            {
+                var destination = grid[source.X, source.Y + direction]
+                    ?? throw new InvalidOperationException();
+
+                //Console.Clear();
+                //grid.Render((node, draw) =>
+                //{
+                //    if (node == source)
+                //    {
+                //        draw($"S");
+                //    }
+                //    else if(node == destination)
+                //    {
+                //        draw($"D{source.Value}");
+                //    }
+                //    else
+                //    {
+                //        draw(node.Value.ToString());
+                //    }
+                //}, null);
+
+                destination.SetValue(source.Value);
+                source.SetValue('.');
+            }
+            //Console.WriteLine($"Can move {move}");
+        }
+        else
+        {
+            //Console.WriteLine($"Cannot move {move}");
+            return player;
+        }
+    }
+
+    return MovePlayerTo(player, candidatePosition);
+}
+
+IEnumerable<Node<char>> GetAllGoods() => grid.Nodes().Where(n => n == 'O' || n == '[');
+
+void RenderPlayer(Node<char> player) => Console.WriteLine($"Player: {player.Value} X:{player.X} Y:{player.Y}");
+
+Node<char> MovePlayerTo(Node<char> player, Node<char> destination)
+{
+    destination.SetValue('@');
+    player.SetValue('.');
+    return destination;
+}
+
 
 bool Move()
 {
@@ -82,87 +230,21 @@ bool Move()
     return true;
 }
 
-bool Move2()
+int LargeBoxPosition(Node<char> good)
 {
-    var move = moves[currentMove];
-    var ray = RayCast(move, player).ToList();
-    var leftRay = RayCast(move, grid.Left(player)).ToList();
-    var rightRay = RayCast(move, grid.Right(player)).ToList(); 
-
-    var candidatePosition = ray.First();
-    currentMove = (currentMove + 1) % moves.Count;
-
-    if (candidatePosition == '#')
+    var w = good.X;// Math.Min(good.X, grid.Width - (good.X + 1));
+    if (w <= 0)
     {
-        return false;
-    }
-    else if (candidatePosition == '[' || candidatePosition == ']')
-    {
-        var firstOption = ray.First(n => n == '#' || n == '.');
-        if (firstOption == '#')
-        {
-            return false;
-        }
-
-        if (move == '<' || move == '>')
-        {
-            var playerIndex = ray.IndexOf(candidatePosition);
-            var firstEmptyIndex = ray.IndexOf(firstOption);
-
-            for (int i = firstEmptyIndex; i > playerIndex; i--)
-            {
-                ray[i].SetValue(ray[i - 1].Value);
-            }
-        }
-        else if (candidatePosition == '[')
-        {
-            var otherNode = grid[(player.X + 1), player.Y];
-            var otherRay = RayCast(move, otherNode).ToList();
-            var otherFirstOption = otherRay.First(n => n == '#' || n == '.');
-            if (otherFirstOption == '#')
-            {
-                return false;
-            }
-
-            var playerIndex = ray.IndexOf(candidatePosition);
-            var firstEmptyIndex = ray.IndexOf(firstOption);
-            
-            for (int i = firstEmptyIndex; i > playerIndex; i--)
-            {
-                ray[i].SetValue(ray[i - 1].Value);
-                otherRay[i].SetValue(otherRay[i - 1].Value);
-            }
-            grid[candidatePosition.X + 1, candidatePosition.Y]!.SetValue('.');
-        }
-        else if (candidatePosition == ']')
-        {
-            var otherNode = grid[player.X - 1, player.Y];
-            var otherRay = RayCast(move, otherNode).ToList();
-            var otherFirstOption = otherRay.First(n => n == '#' || n == '.');
-            if (otherFirstOption == '#')
-            {
-                return false;
-            }
-
-            var playerIndex = ray.IndexOf(candidatePosition);
-            var firstEmptyIndex = ray.IndexOf(firstOption);
-
-            for (int i = firstEmptyIndex; i > playerIndex; i--)
-            {
-                ray[i].SetValue(ray[i - 1].Value);
-                otherRay[i].SetValue(otherRay[i - 1].Value);
-            }
-            grid[candidatePosition.X - 1, candidatePosition.Y]!.SetValue('.');
-        }
+        throw new InvalidOperationException("");
     }
 
-    candidatePosition.SetValue('@');
-    player.SetValue('.');
-    player = candidatePosition;
+    var h = good.Y;// Math.Min(good.Y, (grid.Height-1)- good.Y);
+    if (h <= 0)
+    {
+        throw new InvalidOperationException("");
+    }
+    Console.WriteLine($"The output was calculated by h:{good.Y} * 100 + w:{w} = {h * 100 + w}");
 
-    return true;
+    return (good.Y * 100) + w;
 }
 
-IEnumerable<Node<char>> GetAllGoods() => grid.Nodes().Where(n => n == 'O');
-
-void RenderPlayer(Node<char> player) => Console.WriteLine($"Player: {player.Value} X:{player.X} Y:{player.Y}");
